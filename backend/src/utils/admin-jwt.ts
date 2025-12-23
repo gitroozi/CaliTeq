@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken'
+import jwt, { type SignOptions } from 'jsonwebtoken'
 
 const ADMIN_JWT_SECRET = process.env.ADMIN_JWT_SECRET || 'admin-secret'
 const ADMIN_JWT_REFRESH_SECRET = process.env.ADMIN_JWT_REFRESH_SECRET || 'admin-refresh-secret'
@@ -20,18 +20,20 @@ export interface AdminRefreshTokenPayload {
  * Generate admin access token (short-lived: 5 minutes)
  */
 export function generateAdminToken(payload: AdminTokenPayload): string {
-  return jwt.sign(payload, ADMIN_JWT_SECRET, {
-    expiresIn: ADMIN_JWT_EXPIRES_IN,
-  })
+  const options: SignOptions = {
+    expiresIn: ADMIN_JWT_EXPIRES_IN as SignOptions['expiresIn'],
+  }
+  return jwt.sign(payload, ADMIN_JWT_SECRET, options)
 }
 
 /**
  * Generate admin refresh token (medium-lived: 1 day)
  */
 export function generateAdminRefreshToken(payload: AdminRefreshTokenPayload): string {
-  return jwt.sign(payload, ADMIN_JWT_REFRESH_SECRET, {
-    expiresIn: ADMIN_JWT_REFRESH_EXPIRES_IN,
-  })
+  const options: SignOptions = {
+    expiresIn: ADMIN_JWT_REFRESH_EXPIRES_IN as SignOptions['expiresIn'],
+  }
+  return jwt.sign(payload, ADMIN_JWT_REFRESH_SECRET, options)
 }
 
 /**

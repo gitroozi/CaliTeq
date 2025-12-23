@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken'
+import jwt, { type SignOptions } from 'jsonwebtoken'
 import dotenv from 'dotenv'
 
 dotenv.config()
@@ -17,18 +17,20 @@ export interface TokenPayload {
  * Generate access token (short-lived)
  */
 export const generateAccessToken = (payload: TokenPayload): string => {
-  return jwt.sign(payload, JWT_SECRET, {
-    expiresIn: JWT_EXPIRES_IN,
-  })
+  const options: SignOptions = {
+    expiresIn: JWT_EXPIRES_IN as SignOptions['expiresIn'],
+  }
+  return jwt.sign(payload, JWT_SECRET, options)
 }
 
 /**
  * Generate refresh token (long-lived)
  */
 export const generateRefreshToken = (payload: TokenPayload): string => {
-  return jwt.sign(payload, JWT_REFRESH_SECRET, {
-    expiresIn: JWT_REFRESH_EXPIRES_IN,
-  })
+  const options: SignOptions = {
+    expiresIn: JWT_REFRESH_EXPIRES_IN as SignOptions['expiresIn'],
+  }
+  return jwt.sign(payload, JWT_REFRESH_SECRET, options)
 }
 
 /**
