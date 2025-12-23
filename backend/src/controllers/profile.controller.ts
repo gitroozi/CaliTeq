@@ -1,11 +1,6 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
+import { AuthRequest } from '../types/express';
 import profileService, { CreateProfileData, UpdateProfileData } from '../services/profile.service';
-
-// Extend Express Request to include user from auth middleware
-export interface AuthRequest extends Request {
-  userId?: string;
-  userEmail?: string;
-}
 
 // =====================================================
 // PROFILE CONTROLLER

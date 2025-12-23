@@ -1,11 +1,6 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
+import { AuthRequest } from '../types/express';
 import { workoutLogService } from '../services/workout-log.service';
-
-// Extend Express Request to include user from auth middleware
-export interface AuthRequest extends Request {
-  userId?: string;
-  userEmail?: string;
-}
 
 export const workoutLogController = {
   /**
