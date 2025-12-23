@@ -3,7 +3,6 @@
     "target": "ES2022",
     "module": "CommonJS",
     "moduleResolution": "node",
-    "types": ["node"],
     "rootDir": "./src",
     "outDir": "./dist",
     "esModuleInterop": true,
