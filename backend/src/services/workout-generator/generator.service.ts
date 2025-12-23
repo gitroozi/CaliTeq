@@ -165,8 +165,22 @@ export async function generateWorkoutPlan(
     exerciseCount += weeklySessionsData.exercisesCreated;
   }
 
+  const formattedWorkoutPlan: GeneratedWorkoutPlan['workoutPlan'] = {
+    id: workoutPlan.id,
+    userId: workoutPlan.user_id,
+    name: workoutPlan.name,
+    description: workoutPlan.ai_explanation ?? null,
+    startDate: workoutPlan.start_date,
+    endDate: workoutPlan.end_date,
+    totalWeeks: workoutPlan.duration_weeks,
+    daysPerWeek: workoutPlan.frequency,
+    splitType: workoutPlan.split_type || 'full_body',
+    mesocycles: workoutPlan.mesocycles,
+    status: workoutPlan.status,
+  };
+
   return {
-    workoutPlan,
+    workoutPlan: formattedWorkoutPlan,
     sessionsCount: sessionCount,
     exercisesCount: exerciseCount,
   };

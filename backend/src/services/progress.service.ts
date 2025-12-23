@@ -214,18 +214,18 @@ export async function getMetricStats(userId: string, metricType: MetricType, day
 
   // Calculate change for numeric metrics
   if (metricType === 'weight') {
-    const earliestWeight = (firstMetric.data as WeightMetricData).weight_kg;
-    const latestWeight = (lastMetric.data as WeightMetricData).weight_kg;
+    const earliestWeight = (firstMetric.data as unknown as WeightMetricData).weight_kg;
+    const latestWeight = (lastMetric.data as unknown as WeightMetricData).weight_kg;
     stats.change = latestWeight - earliestWeight;
     stats.change_percentage = ((stats.change / earliestWeight) * 100);
   } else if (metricType === 'body_fat') {
-    const earliestBF = (firstMetric.data as BodyFatData).body_fat_percentage;
-    const latestBF = (lastMetric.data as BodyFatData).body_fat_percentage;
+    const earliestBF = (firstMetric.data as unknown as BodyFatData).body_fat_percentage;
+    const latestBF = (lastMetric.data as unknown as BodyFatData).body_fat_percentage;
     stats.change = latestBF - earliestBF;
     stats.change_percentage = ((stats.change / earliestBF) * 100);
   } else if (['waist', 'chest', 'arms', 'thighs'].includes(metricType)) {
-    const earliestMeasurement = (firstMetric.data as BodyMeasurementData).measurement_cm;
-    const latestMeasurement = (lastMetric.data as BodyMeasurementData).measurement_cm;
+    const earliestMeasurement = (firstMetric.data as unknown as BodyMeasurementData).measurement_cm;
+    const latestMeasurement = (lastMetric.data as unknown as BodyMeasurementData).measurement_cm;
     stats.change = latestMeasurement - earliestMeasurement;
     stats.change_percentage = ((stats.change / earliestMeasurement) * 100);
   }
