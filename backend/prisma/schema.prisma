@@ -1,0 +1,577 @@
+// This is your Prisma schema file
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// =====================================================
+// USERS & AUTHENTICATION
+// =====================================================
+
+model User {
+  id       String   @id @default(uuid()) @db.Uuid
+  email    String   @unique @db.VarChar(255)
+  password_hash String @db.VarChar(255)
+
+  // Profile information
+  first_name String? @db.VarChar(100)
+  last_name  String? @db.VarChar(100)
+  date_of_birth DateTime? @db.Date
+  gender     String? @db.VarChar(50)
+
+  // Physical metrics
+  height_cm         Decimal? @db.Decimal(5, 2)
+  current_weight_kg Decimal? @db.Decimal(5, 2)
+  target_weight_kg  Decimal? @db.Decimal(5, 2)
+
+  // Account status
+  email_verified    Boolean  @default(false)
+  is_active         Boolean  @default(true)
+  subscription_tier String   @default("free") @db.VarChar(50)
+  subscription_expires_at DateTime?
+
+  // Preferences (JSONB)
+  preferences Json @default("{\"units\":\"metric\",\"notifications\":true,\"theme\":\"light\",\"language\":\"en\"}")
+
+  // Timestamps
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+  last_login_at DateTime?
+  deleted_at    DateTime?
+
+  // Relations
+  profile         UserProfile?
+  workout_plans   WorkoutPlan[]
+  workout_sessions WorkoutSession[]
+  workout_logs    WorkoutLog[]
+  progress_metrics ProgressMetric[]
+  subscription    UserSubscription?
+  credits         UserCredit?
+  credit_transactions CreditTransaction[]
+
+  @@index([email])
+  @@index([subscription_tier])
+  @@index([created_at])
+  @@map("users")
+}
+
+model UserProfile {
+  id      String @id @default(uuid()) @db.Uuid
+  user_id String @unique @db.Uuid
+
+  // Training background
+  training_experience String? @db.VarChar(50) // 'never', 'beginner', 'intermediate', 'advanced'
+  activity_level      String? @db.VarChar(50) // 'sedentary', 'lightly_active', etc.
+
+  // Goals (JSONB array)
+  goals Json @default("[]")
+
+  // Availability
+  days_per_week       Int? @db.Integer
+  minutes_per_session Int? @db.Integer
+
+  // Medical information (JSONB)
+  injuries            Json @default("[]")
+  medical_conditions  String[]
+  exercise_clearance  Boolean @default(false)
+
+  // Equipment (JSONB)
+  equipment Json @default("{\"pullUpBar\":false,\"dipBars\":false,\"resistanceBands\":false,\"elevatedSurface\":true,\"other\":[]}")
+
+  // Movement assessment (JSONB)
+  assessment_scores Json @default("{\"pushLevel\":1,\"pullLevel\":1,\"squatLevel\":1,\"hingeLevel\":1,\"coreLevel\":1}")
+
+  // Timestamps
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@map("user_profiles")
+}
+
+// =====================================================
+// EXERCISE LIBRARY
+// =====================================================
+
+model MovementPattern {
+  id           String   @id @default(uuid()) @db.Uuid
+  name         String   @unique @db.VarChar(100)
+  display_name String   @db.VarChar(100)
+  category     String   @db.VarChar(50) // 'primary', 'secondary', 'skill_based', 'auxiliary'
+  description  String?  @db.Text
+  sort_order   Int?
+
+  created_at DateTime @default(now())
+
+  // Relations
+  exercises Exercise[]
+
+  @@map("movement_patterns")
+}
+
+model Exercise {
+  id   String @id @default(uuid()) @db.Uuid
+  name String @db.VarChar(255)
+  slug String @unique @db.VarChar(255)
+
+  // Classification
+  movement_pattern_id String @db.Uuid
+  difficulty          Int    @db.Integer // 1-10
+
+  // Content
+  description    String? @db.Text
+  video_url      String? @db.VarChar(500)
+  thumbnail_url  String? @db.VarChar(500)
+  video_urls     Json    @default("[]") // Additional angles
+
+  // Instructions
+  setup_instructions     String?  @db.Text
+  execution_instructions String?  @db.Text
+  common_mistakes        String[]
+  coaching_cues          String[]
+  target_muscles         String[]
+
+  // Progression pathway
+  regression_id    String?  @db.Uuid
+  progression_id   String?  @db.Uuid
+  alternative_ids  String[] @db.Uuid
+
+  // Requirements
+  equipment_required String[]
+  contraindications  String[]
+
+  // Modifications (JSONB)
+  modifications Json @default("[]")
+
+  // Metadata
+  tags                          String[]
+  estimated_time_to_master_weeks Int?
+
+  // Status
+  is_published Boolean @default(true)
+
+  // Timestamps
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // Relations
+  movement_pattern        MovementPattern         @relation(fields: [movement_pattern_id], references: [id])
+  regression              Exercise?               @relation("Regression", fields: [regression_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  progression             Exercise?               @relation("Progression", fields: [progression_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  regressions             Exercise[]              @relation("Progression")
+  progressions            Exercise[]              @relation("Regression")
+  workout_session_exercises WorkoutSessionExercise[]
+  exercise_logs           ExerciseLog[]
+  progressions_from       ExerciseProgression[]   @relation("FromExercise")
+  progressions_to         ExerciseProgression[]   @relation("ToExercise")
+
+  @@index([movement_pattern_id])
+  @@index([difficulty])
+  @@index([slug])
+  @@map("exercises")
+}
+
+model ExerciseProgression {
+  id                String @id @default(uuid()) @db.Uuid
+  from_exercise_id  String @db.Uuid
+  to_exercise_id    String @db.Uuid
+  progression_type  String @db.VarChar(50) // 'regression', 'progression', 'alternative'
+
+  // Relations
+  from_exercise Exercise @relation("FromExercise", fields: [from_exercise_id], references: [id], onDelete: Cascade)
+  to_exercise   Exercise @relation("ToExercise", fields: [to_exercise_id], references: [id], onDelete: Cascade)
+
+  @@unique([from_exercise_id, to_exercise_id, progression_type])
+  @@index([from_exercise_id])
+  @@index([to_exercise_id])
+  @@map("exercise_progressions")
+}
+
+// =====================================================
+// WORKOUT PLANS & SESSIONS
+// =====================================================
+
+model WorkoutPlan {
+  id      String @id @default(uuid()) @db.Uuid
+  user_id String @db.Uuid
+
+  // Plan metadata
+  name       String   @db.VarChar(255)
+  start_date DateTime @db.Date
+  end_date   DateTime @db.Date
+
+  // Structure
+  duration_weeks Int    @default(12)
+  frequency      Int    @db.Integer // Sessions per week
+  split_type     String? @db.VarChar(50) // 'full_body', 'upper_lower', 'push_pull_legs'
+
+  // Periodization (JSONB)
+  mesocycles   Json
+  deload_weeks Int[]
+
+  // AI context
+  generation_prompt String? @db.Text
+  ai_explanation    String? @db.Text
+
+  // Status
+  status String @default("active") @db.VarChar(50) // 'active', 'completed', 'paused', 'cancelled'
+
+  // Timestamps
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // Relations
+  user             User             @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  workout_sessions WorkoutSession[]
+
+  @@index([user_id])
+  @@index([status])
+  @@index([start_date])
+  @@map("workout_plans")
+}
+
+model WorkoutSession {
+  id              String @id @default(uuid()) @db.Uuid
+  workout_plan_id String @db.Uuid
+  user_id         String @db.Uuid
+
+  // Schedule
+  week_number     Int      @db.Integer
+  day_of_week     Int      @db.Integer // 1-7
+  session_number  Int      @db.Integer
+  scheduled_date  DateTime @db.Date
+
+  // Workout details
+  name      String  @db.VarChar(255)
+  is_deload Boolean @default(false)
+
+  // Warm-up and cool-down (JSONB)
+  warmup   Json @default("[]")
+  cooldown Json @default("[]")
+
+  // Status
+  status       String    @default("scheduled") @db.VarChar(50) // 'scheduled', 'in_progress', 'completed', 'skipped'
+  completed_at DateTime?
+
+  // Timestamps
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // Relations
+  workout_plan              WorkoutPlan              @relation(fields: [workout_plan_id], references: [id], onDelete: Cascade)
+  user                      User                     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  workout_session_exercises WorkoutSessionExercise[]
+  workout_logs              WorkoutLog[]
+
+  @@index([workout_plan_id])
+  @@index([user_id])
+  @@index([scheduled_date])
+  @@index([status])
+  @@map("workout_sessions")
+}
+
+model WorkoutSessionExercise {
+  id                 String @id @default(uuid()) @db.Uuid
+  workout_session_id String @db.Uuid
+  exercise_id        String @db.Uuid
+
+  // Order and prescription
+  exercise_order Int    @db.Integer
+  sets           Int    @db.Integer
+  reps           String @db.VarChar(50) // "8-12" or "AMRAP" or "30s hold"
+  rest_seconds   Int?
+  tempo          String? @db.VarChar(20)
+
+  // AI-generated notes
+  coaching_notes String? @db.Text
+
+  // Timestamps
+  created_at DateTime @default(now())
+
+  // Relations
+  workout_session WorkoutSession @relation(fields: [workout_session_id], references: [id], onDelete: Cascade)
+  exercise        Exercise       @relation(fields: [exercise_id], references: [id])
+
+  @@index([workout_session_id])
+  @@index([exercise_id])
+  @@index([workout_session_id, exercise_order])
+  @@map("workout_session_exercises")
+}
+
+// =====================================================
+// WORKOUT LOGS & PROGRESS
+// =====================================================
+
+model WorkoutLog {
+  id                 String  @id @default(uuid()) @db.Uuid
+  user_id            String  @db.Uuid
+  workout_session_id String? @db.Uuid
+
+  // Session timing
+  started_at   DateTime
+  completed_at DateTime
+
+  // Subjective feedback (1-10 scale)
+  overall_difficulty Int?    @db.Integer
+  energy_level       Int?    @db.Integer
+  enjoyment          Int?    @db.Integer
+  notes              String? @db.Text
+
+  // Pain reports (JSONB)
+  pain_reports Json @default("[]")
+
+  // Timestamps
+  created_at DateTime @default(now())
+
+  // Relations
+  user            User            @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  workout_session WorkoutSession? @relation(fields: [workout_session_id], references: [id], onDelete: SetNull)
+  exercise_logs   ExerciseLog[]
+
+  @@index([user_id])
+  @@index([workout_session_id])
+  @@index([started_at])
+  @@map("workout_logs")
+}
+
+model ExerciseLog {
+  id              String @id @default(uuid()) @db.Uuid
+  workout_log_id  String @db.Uuid
+  exercise_id     String @db.Uuid
+
+  // Set-by-set performance (JSONB)
+  sets Json
+
+  // Aggregate stats
+  total_reps Int?     @db.Integer
+  max_reps   Int?     @db.Integer
+  avg_rpe    Decimal? @db.Decimal(3, 1)
+
+  // Timestamps
+  created_at DateTime @default(now())
+
+  // Relations
+  workout_log WorkoutLog @relation(fields: [workout_log_id], references: [id], onDelete: Cascade)
+  exercise    Exercise   @relation(fields: [exercise_id], references: [id])
+
+  @@index([workout_log_id])
+  @@index([exercise_id])
+  @@map("exercise_logs")
+}
+
+model ProgressMetric {
+  id          String   @id @default(uuid()) @db.Uuid
+  user_id     String   @db.Uuid
+  recorded_at DateTime @default(now())
+
+  // Metric type
+  metric_type String @db.VarChar(50) // 'weight', 'waist', 'body_fat', 'rep_max', 'wellness'
+
+  // Data (JSONB for polymorphic storage)
+  data Json
+
+  // Notes
+  notes String? @db.Text
+
+  // Timestamps
+  created_at DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([metric_type])
+  @@index([recorded_at])
+  @@index([user_id, metric_type, recorded_at])
+  @@map("progress_metrics")
+}
+
+// =====================================================
+// ADMIN & SUBSCRIPTION SYSTEM
+// =====================================================
+
+model Admin {
+  id            String   @id @default(uuid()) @db.Uuid
+  email         String   @unique @db.VarChar(255)
+  password_hash String   @db.VarChar(255)
+
+  // Profile
+  first_name String  @db.VarChar(100)
+  last_name  String  @db.VarChar(100)
+
+  // Permissions
+  is_super_admin Boolean @default(false)
+  is_active      Boolean @default(true)
+
+  // Timestamps
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+  last_login_at DateTime?
+
+  // Relations
+  audit_logs AuditLog[]
+
+  @@index([email])
+  @@index([is_active])
+  @@map("admins")
+}
+
+model SubscriptionTier {
+  id   String @id @default(uuid()) @db.Uuid
+  name String @unique @db.VarChar(50) // 'free', 'pro', 'premium'
+
+  // Pricing
+  price_monthly    Decimal @db.Decimal(10, 2)
+  credits_per_month Int    @db.Integer
+
+  // Features (JSONB)
+  features Json @default("{}")
+
+  // Display
+  display_name String @db.VarChar(100)
+  description  String @db.Text
+
+  // Status
+  is_active Boolean @default(true)
+  sort_order Int    @default(0)
+
+  // Timestamps
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // Relations
+  user_subscriptions UserSubscription[]
+
+  @@index([name])
+  @@index([is_active])
+  @@map("subscription_tiers")
+}
+
+model UserSubscription {
+  id                   String @id @default(uuid()) @db.Uuid
+  user_id              String @unique @db.Uuid
+  subscription_tier_id String @db.Uuid
+
+  // Subscription period
+  started_at DateTime @default(now())
+  expires_at DateTime?
+
+  // Status
+  status     String  @db.VarChar(50) // 'active', 'cancelled', 'expired', 'past_due'
+  auto_renew Boolean @default(true)
+
+  // Payment reference (for future Stripe integration)
+  stripe_subscription_id String? @unique @db.VarChar(255)
+  stripe_customer_id     String? @db.VarChar(255)
+
+  // Timestamps
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+  cancelled_at DateTime?
+
+  // Relations
+  user              User             @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  subscription_tier SubscriptionTier @relation(fields: [subscription_tier_id], references: [id])
+
+  @@index([user_id])
+  @@index([subscription_tier_id])
+  @@index([status])
+  @@index([expires_at])
+  @@map("user_subscriptions")
+}
+
+model UserCredit {
+  id      String @id @default(uuid()) @db.Uuid
+  user_id String @unique @db.Uuid
+
+  // Balance tracking
+  balance          Int @default(0) @db.Integer
+  lifetime_earned  Int @default(0) @db.Integer
+  lifetime_spent   Int @default(0) @db.Integer
+
+  // Timestamps
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@map("user_credits")
+}
+
+model CreditTransaction {
+  id      String @id @default(uuid()) @db.Uuid
+  user_id String @db.Uuid
+
+  // Transaction details
+  amount           Int    @db.Integer // Positive for credits added, negative for credits spent
+  transaction_type String @db.VarChar(50) // 'monthly_grant', 'purchase', 'plan_generation', 'refund', 'admin_grant', 'admin_revoke'
+
+  // Reference to related entity (workout plan, purchase, etc.)
+  reference_id   String? @db.Uuid
+  reference_type String? @db.VarChar(50) // 'workout_plan', 'purchase', etc.
+
+  // Description
+  description String @db.Text
+
+  // Balance after transaction
+  balance_after Int @db.Integer
+
+  // Admin action (if applicable)
+  admin_id String? @db.Uuid
+
+  // Timestamps
+  created_at DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([transaction_type])
+  @@index([created_at])
+  @@index([reference_id, reference_type])
+  @@map("credit_transactions")
+}
+
+model AuditLog {
+  id       String @id @default(uuid()) @db.Uuid
+  admin_id String @db.Uuid
+
+  // Action details
+  action      String @db.VarChar(100) // 'user.view', 'user.update', 'subscription.change', 'credits.grant', 'impersonation.start', etc.
+  target_type String @db.VarChar(50)  // 'user', 'subscription', 'credits', etc.
+  target_id   String @db.Uuid
+
+  // Changes (JSONB - before/after)
+  changes Json?
+
+  // Request context
+  ip_address String? @db.VarChar(45)
+  user_agent String? @db.Text
+
+  // Impersonation tracking
+  impersonated_user_id String? @db.Uuid
+
+  // Timestamps
+  created_at DateTime @default(now())
+
+  // Relations
+  admin Admin @relation(fields: [admin_id], references: [id], onDelete: Cascade)
+
+  @@index([admin_id])
+  @@index([action])
+  @@index([target_type, target_id])
+  @@index([created_at])
+  @@index([impersonated_user_id])
+  @@map("audit_logs")
+}
