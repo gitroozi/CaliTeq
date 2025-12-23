@@ -85,7 +85,7 @@ export default function Login() {
         </Button>
 
         <div className="text-xs text-slate-500 text-center">
-          By continuing, you agree to the CaliFlow terms and privacy policy.
+          By continuing, you agree to the CaliTeq terms and privacy policy.
         </div>
       </form>
     </AuthLayout>

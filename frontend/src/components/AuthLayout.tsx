@@ -19,7 +19,7 @@ export default function AuthLayout({
       <div className="mx-auto grid max-w-6xl gap-10 px-6 py-12 lg:grid-cols-[1.2fr_1fr]">
         <div className="flex flex-col justify-center gap-6">
           <NavLink to="/" className="text-sm font-semibold text-primary-700">
-            CaliFlow
+            CaliTeq
           </NavLink>
           <div>
             <h1 className="text-3xl font-semibold tracking-tight text-slate-900">

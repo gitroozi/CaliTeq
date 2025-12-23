@@ -31,7 +31,7 @@ export default function AppShell({ children }: AppShellProps) {
             to="/"
             className="text-lg font-semibold tracking-tight text-primary-700"
           >
-            CaliFlow
+            CaliTeq
           </NavLink>
           <nav className="hidden items-center gap-5 text-sm font-medium text-slate-600 md:flex">
             {navItems.map((item) => (

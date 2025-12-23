@@ -106,7 +106,7 @@ export default function Dashboard() {
       <AppShell>
         <div className="mx-auto max-w-4xl px-6 py-16">
           <div className="text-center">
-            <h1 className="text-3xl font-bold text-slate-900">Welcome to CaliFlow!</h1>
+            <h1 className="text-3xl font-bold text-slate-900">Welcome to CaliTeq!</h1>
             <p className="mt-4 text-lg text-slate-600">
               You don't have an active workout plan yet.
             </p>

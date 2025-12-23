@@ -8,7 +8,7 @@ export default function Home() {
         <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr]">
           <div className="space-y-6">
             <p className="text-sm font-semibold uppercase tracking-wide text-primary-600">
-              CaliFlow MVP
+              CaliTeq MVP
             </p>
             <h1 className="text-4xl font-semibold tracking-tight text-slate-900 md:text-5xl">
               Build a calisthenics plan that adapts to you.
