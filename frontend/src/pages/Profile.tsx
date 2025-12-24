@@ -1132,15 +1132,19 @@ export default function Profile() {
                   <h3 className="text-base font-medium text-slate-900 mb-4">Change Password</h3>
 
                   {passwordError && (
-                    <Alert variant="error" className="mb-4">
-                      {passwordError}
-                    </Alert>
+                    <div className="mb-4">
+                      <Alert variant="error">
+                        {passwordError}
+                      </Alert>
+                    </div>
                   )}
 
                   {passwordSuccess && (
-                    <Alert variant="success" className="mb-4">
-                      {passwordSuccess}
-                    </Alert>
+                    <div className="mb-4">
+                      <Alert variant="success">
+                        {passwordSuccess}
+                      </Alert>
+                    </div>
                   )}
 
                   <form onSubmit={handlePasswordChange} className="space-y-4">
