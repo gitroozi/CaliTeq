@@ -282,3 +282,87 @@ export const getCurrentUser = async (req: Request, res: Response) => {
     })
   }
 }
+
+/**
+ * Change user password
+ * PUT /api/auth/password
+ */
+export const changePassword = async (req: Request & { userId?: string }, res: Response) => {
+  try {
+    const userId = req.userId
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: 'Unauthorized',
+      })
+    }
+
+    const { currentPassword, newPassword } = req.body
+
+    // Validate required fields
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'Current password and new password are required',
+      })
+    }
+
+    // Validate new password strength
+    const passwordValidation = validatePassword(newPassword)
+    if (!passwordValidation.valid) {
+      return res.status(400).json({
+        success: false,
+        message: passwordValidation.message,
+      })
+    }
+
+    // Get user with password hash
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        password_hash: true,
+      },
+    })
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+      })
+    }
+
+    // Verify current password
+    const isPasswordValid = await comparePassword(currentPassword, user.password_hash)
+    if (!isPasswordValid) {
+      return res.status(401).json({
+        success: false,
+        message: 'Current password is incorrect',
+      })
+    }
+
+    // Hash new password
+    const newPasswordHash = await hashPassword(newPassword)
+
+    // Update password
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        password_hash: newPasswordHash,
+        updated_at: new Date(),
+      },
+    })
+
+    res.status(200).json({
+      success: true,
+      message: 'Password changed successfully',
+    })
+  } catch (error) {
+    console.error('Change password error:', error)
+    res.status(500).json({
+      success: false,
+      message: 'Failed to change password',
+    })
+  }
+}

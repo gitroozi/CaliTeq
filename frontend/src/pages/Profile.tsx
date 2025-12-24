@@ -7,6 +7,7 @@ import LoadingSpinner from '../components/ui/LoadingSpinner';
 import Alert from '../components/ui/Alert';
 import { useUserStore } from '../store/userStore';
 import { useAuthStore } from '../store/authStore';
+import { authApi } from '../services/api';
 import { format } from 'date-fns';
 import type { Equipment, AssessmentScores, Gender, TrainingExperience, ActivityLevel } from '../types';
 
@@ -25,6 +26,14 @@ export default function Profile() {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+
+  // Password change state
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [passwordSuccess, setPasswordSuccess] = useState('');
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
 
   // Form states
   const [firstName, setFirstName] = useState('');
@@ -219,6 +228,45 @@ export default function Profile() {
   const handleLogout = () => {
     logout();
     navigate('/login');
+  };
+
+  const handlePasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordError('');
+    setPasswordSuccess('');
+
+    // Validation
+    if (newPassword.length < 8) {
+      setPasswordError('New password must be at least 8 characters long');
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setPasswordError('New passwords do not match');
+      return;
+    }
+
+    if (currentPassword === newPassword) {
+      setPasswordError('New password must be different from current password');
+      return;
+    }
+
+    try {
+      setIsChangingPassword(true);
+      await authApi.changePassword({
+        currentPassword,
+        newPassword,
+      });
+
+      setPasswordSuccess('Password changed successfully!');
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (err: any) {
+      setPasswordError(err.response?.data?.message || 'Failed to change password');
+    } finally {
+      setIsChangingPassword(false);
+    }
   };
 
   const availableGoals = [
@@ -1063,6 +1111,102 @@ export default function Profile() {
                   </div>
                 </div>
               )}
+            </CardBody>
+          </Card>
+
+          {/* Security & Password */}
+          <Card variant="bordered">
+            <CardHeader>
+              <div className="flex items-center justify-between w-full">
+                <div>
+                  <h2 className="text-xl font-semibold text-slate-900">Security</h2>
+                  <p className="text-sm text-slate-600 mt-1">
+                    Manage your password and account security
+                  </p>
+                </div>
+              </div>
+            </CardHeader>
+            <CardBody>
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-base font-medium text-slate-900 mb-4">Change Password</h3>
+
+                  {passwordError && (
+                    <Alert variant="error" className="mb-4">
+                      {passwordError}
+                    </Alert>
+                  )}
+
+                  {passwordSuccess && (
+                    <Alert variant="success" className="mb-4">
+                      {passwordSuccess}
+                    </Alert>
+                  )}
+
+                  <form onSubmit={handlePasswordChange} className="space-y-4">
+                    <div>
+                      <label htmlFor="currentPassword" className="block text-sm font-medium text-slate-700 mb-1">
+                        Current Password
+                      </label>
+                      <input
+                        type="password"
+                        id="currentPassword"
+                        value={currentPassword}
+                        onChange={(e) => setCurrentPassword(e.target.value)}
+                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                        required
+                        disabled={isChangingPassword}
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="newPassword" className="block text-sm font-medium text-slate-700 mb-1">
+                        New Password
+                      </label>
+                      <input
+                        type="password"
+                        id="newPassword"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                        required
+                        minLength={8}
+                        disabled={isChangingPassword}
+                      />
+                      <p className="text-xs text-slate-500 mt-1">
+                        Must be at least 8 characters long
+                      </p>
+                    </div>
+
+                    <div>
+                      <label htmlFor="confirmPassword" className="block text-sm font-medium text-slate-700 mb-1">
+                        Confirm New Password
+                      </label>
+                      <input
+                        type="password"
+                        id="confirmPassword"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                        required
+                        minLength={8}
+                        disabled={isChangingPassword}
+                      />
+                    </div>
+
+                    <div className="flex gap-3">
+                      <Button
+                        type="submit"
+                        variant="primary"
+                        disabled={isChangingPassword}
+                        isLoading={isChangingPassword}
+                      >
+                        {isChangingPassword ? 'Changing Password...' : 'Change Password'}
+                      </Button>
+                    </div>
+                  </form>
+                </div>
+              </div>
             </CardBody>
           </Card>
         </div>

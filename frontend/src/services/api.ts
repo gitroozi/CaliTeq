@@ -303,6 +303,10 @@ export const authApi = {
     return mapUser(response.data.data.user);
   },
 
+  changePassword: async (data: { currentPassword: string; newPassword: string }): Promise<void> => {
+    await apiClient.put('/auth/password', data);
+  },
+
   logout: () => {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');

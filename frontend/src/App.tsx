@@ -26,6 +26,7 @@ import AdminUserDetail from './pages/admin/AdminUserDetail'
 import AdminSubscriptions from './pages/admin/AdminSubscriptions'
 import AdminAudit from './pages/admin/AdminAudit'
 import AdminManagement from './pages/admin/AdminManagement'
+import AdminSettings from './pages/admin/AdminSettings'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -185,6 +186,14 @@ function App() {
             element={
               <AdminProtectedRoute requireSuperAdmin={true}>
                 <AdminManagement />
+              </AdminProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/settings"
+            element={
+              <AdminProtectedRoute>
+                <AdminSettings />
               </AdminProtectedRoute>
             }
           />

@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { register, login, refreshToken, getCurrentUser } from '../controllers/auth.controller.js'
+import { register, login, refreshToken, getCurrentUser, changePassword } from '../controllers/auth.controller.js'
 import { authenticate } from '../middleware/auth.middleware.js'
 
 const router = Router()
@@ -31,5 +31,12 @@ router.post('/refresh', refreshToken)
  * @access  Private
  */
 router.get('/me', authenticate, getCurrentUser)
+
+/**
+ * @route   PUT /api/auth/password
+ * @desc    Change user password
+ * @access  Private
+ */
+router.put('/password', authenticate, changePassword)
 
 export default router
