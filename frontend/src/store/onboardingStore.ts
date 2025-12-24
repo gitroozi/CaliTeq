@@ -23,7 +23,7 @@ interface OnboardingData {
   goals: string[];
 
   // Step 3: Medical
-  injuries: string[];
+  injuries: Array<{ type: string; severity: string; description?: string }>;
   medicalConditions: string[];
   exerciseClearance: boolean;
 
@@ -43,7 +43,7 @@ interface OnboardingState {
   // Actions
   updatePersonalDetails: (data: Partial<OnboardingData>) => void;
   updateGoals: (goals: string[]) => void;
-  updateMedical: (data: { injuries: string[]; medicalConditions: string[]; exerciseClearance: boolean }) => void;
+  updateMedical: (data: { injuries: Array<{ type: string; severity: string; description?: string }>; medicalConditions: string[]; exerciseClearance: boolean }) => void;
   updateEquipmentAndAvailability: (data: { equipment: Equipment; daysPerWeek: number; minutesPerSession: number }) => void;
   updateAssessment: (scores: AssessmentScores) => void;
   setCurrentStep: (step: number) => void;

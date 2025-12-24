@@ -8,7 +8,9 @@ import { useOnboardingStore } from '../store/onboardingStore';
 export default function OnboardingStep3() {
   const navigate = useNavigate();
   const { data, updateMedical, setCurrentStep } = useOnboardingStore();
-  const [injuries, setInjuries] = useState<string>(data.injuries.join(', '));
+  const [injuries, setInjuries] = useState<string>(
+    data.injuries.map(i => i.type).join(', ')
+  );
   const [medicalConditions, setMedicalConditions] = useState<string>(data.medicalConditions.join(', '));
   const [exerciseClearance, setExerciseClearance] = useState(data.exerciseClearance);
   const [error, setError] = useState('');
@@ -29,7 +31,12 @@ export default function OnboardingStep3() {
     const injuriesArray = injuries
       .split(',')
       .map((s) => s.trim())
-      .filter((s) => s.length > 0);
+      .filter((s) => s.length > 0)
+      .map((injury) => ({
+        type: injury,
+        severity: 'mild', // Default severity since we don't ask for it in the UI
+        description: injury,
+      }));
 
     const medicalConditionsArray = medicalConditions
       .split(',')
