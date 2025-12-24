@@ -60,9 +60,13 @@ export const createProfile = async (req: AuthRequest, res: Response) => {
 
     const profileData: CreateProfileData = req.body;
 
+    console.log('Creating profile for user:', userId);
+    console.log('Profile data received:', JSON.stringify(profileData, null, 2));
+
     // Basic validation
     const errors = validateProfileData(profileData);
     if (errors.length > 0) {
+      console.error('Validation errors:', errors);
       return res.status(400).json({
         success: false,
         error: 'Validation failed',
@@ -76,11 +80,15 @@ export const createProfile = async (req: AuthRequest, res: Response) => {
       success: true,
       data: profile,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Create profile error:', error);
+    console.error('Error name:', error.name);
+    console.error('Error message:', error.message);
+    console.error('Error stack:', error.stack);
     return res.status(500).json({
       success: false,
       error: 'Failed to create profile',
+      details: error.message,
     });
   }
 };
