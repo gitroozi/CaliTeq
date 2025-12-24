@@ -25,4 +25,6 @@ export interface AdminRequest extends Request {
   body: any;
   params: any;
   query: any;
+  ip: string;
+  headers: any;
 }
