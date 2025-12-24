@@ -96,7 +96,7 @@ export default function Profile() {
       setMinutesPerSession(profile.minutesPerSession?.toString() || '');
       setEquipment(profile.equipment);
       setAssessmentScores(profile.assessmentScores);
-      setInjuries(profile.injuries?.join(', ') || '');
+      setInjuries(profile.injuries?.map(i => i.type).join(', ') || '');
       setMedicalConditions(profile.medicalConditions?.join(', ') || '');
       setExerciseClearance(profile.exerciseClearance);
     }
@@ -210,7 +210,13 @@ export default function Profile() {
 
     try {
       await updateProfile({
-        injuries: injuries ? injuries.split(',').map((s) => s.trim()).filter(Boolean) : [],
+        injuries: injuries
+          ? injuries.split(',').map((s) => s.trim()).filter(Boolean).map(injury => ({
+              type: injury,
+              severity: 'mild',
+              description: injury,
+            }))
+          : [],
         medicalConditions: medicalConditions
           ? medicalConditions.split(',').map((s) => s.trim()).filter(Boolean)
           : [],
