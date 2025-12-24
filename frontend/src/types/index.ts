@@ -44,6 +44,12 @@ export type TrainingExperience = 'never' | 'beginner' | 'intermediate' | 'advanc
 export type ActivityLevel = 'sedentary' | 'lightly_active' | 'moderately_active' | 'very_active' | 'extremely_active';
 export type Gender = 'male' | 'female' | 'other' | 'prefer_not_to_say';
 
+export interface Injury {
+  type: string;
+  severity: string;
+  description?: string;
+}
+
 export interface UserProfile {
   id: string;
   userId: string;
@@ -52,7 +58,7 @@ export interface UserProfile {
   goals: string[];
   daysPerWeek: number | null;
   minutesPerSession: number | null;
-  injuries: string[];
+  injuries: Injury[];
   medicalConditions: string[];
   exerciseClearance: boolean;
   equipment: Equipment;
@@ -90,7 +96,7 @@ export interface CreateProfileData {
   goals: string[];
   daysPerWeek: number;
   minutesPerSession: number;
-  injuries: string[];
+  injuries: Injury[];
   medicalConditions: string[];
   exerciseClearance: boolean;
   equipment: Equipment;
