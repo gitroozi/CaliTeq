@@ -157,18 +157,18 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         </nav>
 
         {/* Admin info at bottom */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200">
-          <div className="flex items-center">
+        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 bg-white">
+          <div className="flex items-center gap-3">
             <div className="flex-shrink-0">
-              <div className="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-medium">
+              <div className="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-medium text-sm">
                 {admin?.firstName?.[0]}{admin?.lastName?.[0]}
               </div>
             </div>
-            <div className="ml-3 flex-1 min-w-0">
+            <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-gray-900 truncate">
                 {admin?.firstName} {admin?.lastName}
               </p>
-              <p className="text-xs text-gray-500 truncate">
+              <p className="text-xs text-gray-500 mt-0.5">
                 {admin?.isSuperAdmin ? 'Super Admin' : 'Admin'}
               </p>
             </div>
