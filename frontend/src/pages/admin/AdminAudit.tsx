@@ -323,13 +323,13 @@ export default function AdminAudit() {
                       </div>
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-500">
-                      {log.changes && typeof log.changes === 'object' ? (
+                      {log.changes ? (
                         <div className="max-w-xs truncate">
                           {Object.keys(log.changes).length} changes
                         </div>
                       ) : (
                         <span className="max-w-xs truncate block">
-                          {log.changes?.toString() || 'N/A'}
+                          N/A
                         </span>
                       )}
                     </td>

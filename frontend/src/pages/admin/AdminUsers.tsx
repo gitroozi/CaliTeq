@@ -35,7 +35,7 @@ export default function AdminUsers() {
       };
 
       if (search) filters.search = search;
-      if (status) filters.status = status;
+      if (status) filters.status = status as 'active' | 'inactive';
       if (tier) filters.tier = tier;
       if (verified !== '') filters.verified = verified === 'true';
 
