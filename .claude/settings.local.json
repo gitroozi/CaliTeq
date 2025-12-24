@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(kill:*)",
-      "Bash(cd:*)",
-      "Bash(cat:*)"
-    ]
-  }
-}
