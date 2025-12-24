@@ -19,13 +19,5 @@
         }
       ]
     }
-  ],
-  "redirects": [
-    {
-      "source": "/",
-      "destination": "/admin/login",
-      "permanent": false,
-      "host": "admin.caliteq.app"
-    }
   ]
 }
