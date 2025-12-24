@@ -45,6 +45,11 @@ export const useWorkoutStore = create<WorkoutState>((set) => ({
       const todayWorkout = await workoutApi.getTodayWorkout();
       set({ todayWorkout, isLoading: false });
     } catch (error: any) {
+      // Don't set error for 404 - that just means no workout scheduled for today
+      if (error.response?.status === 404) {
+        set({ todayWorkout: null, isLoading: false });
+        return;
+      }
       const errorMessage = error.response?.data?.error || 'Failed to fetch today\'s workout';
       set({ error: errorMessage, isLoading: false });
     }
