@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { adminUsersApi, getErrorMessage } from '../../services/adminApi';
 import type { User, UsersListResponse, UserFilters } from '../../types/admin';
@@ -229,14 +229,14 @@ export default function AdminUsers() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          user.subscriptionTier === 'pro'
+                          user.subscription?.tier.name === 'pro'
                             ? 'bg-purple-100 text-purple-800'
-                            : user.subscriptionTier === 'enterprise'
+                            : user.subscription?.tier.name === 'enterprise'
                             ? 'bg-blue-100 text-blue-800'
                             : 'bg-gray-100 text-gray-800'
                         }`}
                       >
-                        {user.subscriptionTier}
+                        {user.subscription?.tier.displayName || 'Free'}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">

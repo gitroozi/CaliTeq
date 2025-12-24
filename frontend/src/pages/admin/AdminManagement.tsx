@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { adminAuthApi, getErrorMessage } from '../../services/adminApi';
 import type { Admin } from '../../types/admin';
 import { useIsSuperAdmin } from '../../store/adminAuthStore';
@@ -53,7 +53,7 @@ export default function AdminManagement() {
         password: newAdminPassword,
         firstName: newAdminFirstName,
         lastName: newAdminLastName,
-        isSuperAdmin: newAdminIsSuperAdmin,
+        role: newAdminIsSuperAdmin ? 'super_admin' : 'admin',
       });
 
       await loadAdmins();

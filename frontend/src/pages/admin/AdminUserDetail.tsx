@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   adminUsersApi,
@@ -95,7 +95,7 @@ export default function AdminUserDetail() {
     try {
       setActionLoading(true);
       await adminUsersApi.updateUserStatus(id, {
-        isActive: !user.is_active,
+        isActive: !user.isActive,
         reason: deactivateReason || undefined,
       });
       await loadUserData();
@@ -154,7 +154,7 @@ export default function AdminUserDetail() {
     try {
       setActionLoading(true);
       await adminSubscriptionsApi.changeUserSubscription(id, {
-        tier: newTier,
+        tierName: newTier,
         reason: subscriptionReason,
       });
       await loadUserData();
@@ -208,8 +208,8 @@ export default function AdminUserDetail() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">
-              {user.first_name && user.last_name
-                ? `${user.first_name} ${user.last_name}`
+              {user.firstName && user.lastName
+                ? `${user.firstName} ${user.lastName}`
                 : user.email}
             </h1>
             <p className="text-gray-600 mt-1">User ID: {user.id}</p>
@@ -218,12 +218,12 @@ export default function AdminUserDetail() {
             <button
               onClick={() => setShowDeactivateModal(true)}
               className={`px-4 py-2 rounded-md font-medium ${
-                user.is_active
+                user.isActive
                   ? 'bg-red-600 text-white hover:bg-red-700'
                   : 'bg-green-600 text-white hover:bg-green-700'
               }`}
             >
-              {user.is_active ? 'Deactivate User' : 'Activate User'}
+              {user.isActive ? 'Deactivate User' : 'Activate User'}
             </button>
           </div>
         </div>
@@ -240,7 +240,7 @@ export default function AdminUserDetail() {
               Email
             </label>
             <p className="mt-1 text-gray-900">{user.email}</p>
-            {user.email_verified && (
+            {user.emailVerified && (
               <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 mt-1">
                 Verified
               </span>
@@ -251,8 +251,8 @@ export default function AdminUserDetail() {
               Name
             </label>
             <p className="mt-1 text-gray-900">
-              {user.first_name && user.last_name
-                ? `${user.first_name} ${user.last_name}`
+              {user.firstName && user.lastName
+                ? `${user.firstName} ${user.lastName}`
                 : 'Not provided'}
             </p>
           </div>
@@ -262,12 +262,12 @@ export default function AdminUserDetail() {
             </label>
             <span
               className={`mt-1 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                user.is_active
+                user.isActive
                   ? 'bg-green-100 text-green-800'
                   : 'bg-red-100 text-red-800'
               }`}
             >
-              {user.is_active ? 'Active' : 'Inactive'}
+              {user.isActive ? 'Active' : 'Inactive'}
             </span>
           </div>
           <div>
@@ -276,14 +276,14 @@ export default function AdminUserDetail() {
             </label>
             <span
               className={`mt-1 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                user.subscription_tier === 'pro'
+                user.subscription?.tier.name === 'pro'
                   ? 'bg-purple-100 text-purple-800'
-                  : user.subscription_tier === 'enterprise'
+                  : user.subscription?.tier.name === 'enterprise'
                   ? 'bg-blue-100 text-blue-800'
                   : 'bg-gray-100 text-gray-800'
               }`}
             >
-              {user.subscription_tier}
+              {user.subscription?.tier.displayName || 'Free'}
             </span>
           </div>
           <div>
@@ -291,7 +291,7 @@ export default function AdminUserDetail() {
               Joined
             </label>
             <p className="mt-1 text-gray-900">
-              {new Date(user.created_at).toLocaleDateString('en-US', {
+              {new Date(user.createdAt).toLocaleDateString('en-US', {
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric',
@@ -303,8 +303,8 @@ export default function AdminUserDetail() {
               Last Active
             </label>
             <p className="mt-1 text-gray-900">
-              {user.last_active_at
-                ? new Date(user.last_active_at).toLocaleDateString('en-US', {
+              {user.lastLoginAt
+                ? new Date(user.lastLoginAt).toLocaleDateString('en-US', {
                     year: 'numeric',
                     month: 'long',
                     day: 'numeric',
@@ -350,7 +350,7 @@ export default function AdminUserDetail() {
                 {subscriptionHistory.map((sub, idx) => (
                   <tr key={idx}>
                     <td className="px-4 py-3 text-sm text-gray-900">
-                      {sub.tier}
+                      {sub.tier.displayName}
                     </td>
                     <td className="px-4 py-3 text-sm">
                       <span
@@ -364,11 +364,11 @@ export default function AdminUserDetail() {
                       </span>
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-500">
-                      {new Date(sub.start_date).toLocaleDateString()}
+                      {new Date(sub.startDate).toLocaleDateString()}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-500">
-                      {sub.end_date
-                        ? new Date(sub.end_date).toLocaleDateString()
+                      {sub.endDate
+                        ? new Date(sub.endDate).toLocaleDateString()
                         : 'Active'}
                     </td>
                   </tr>
@@ -428,12 +428,12 @@ export default function AdminUserDetail() {
                     <td className="px-4 py-3 text-sm">
                       <span
                         className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                          tx.transaction_type === 'credit'
+                          tx.type === 'grant' || tx.type === 'purchase'
                             ? 'bg-green-100 text-green-800'
                             : 'bg-red-100 text-red-800'
                         }`}
                       >
-                        {tx.transaction_type}
+                        {tx.type}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-900">
@@ -444,7 +444,7 @@ export default function AdminUserDetail() {
                       {tx.description || 'N/A'}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-500">
-                      {new Date(tx.created_at).toLocaleDateString()}
+                      {new Date(tx.createdAt).toLocaleDateString()}
                     </td>
                   </tr>
                 ))}
@@ -472,15 +472,15 @@ export default function AdminUserDetail() {
                   <p className="text-sm font-medium text-gray-900">
                     {log.action}
                   </p>
-                  {log.details && (
+                  {log.changes && (
                     <p className="text-sm text-gray-500 mt-1">
-                      {typeof log.details === 'string'
-                        ? log.details
-                        : JSON.stringify(log.details)}
+                      {typeof log.changes === 'string'
+                        ? log.changes
+                        : JSON.stringify(log.changes)}
                     </p>
                   )}
                   <p className="text-xs text-gray-400 mt-1">
-                    {new Date(log.created_at).toLocaleString()}
+                    {new Date(log.createdAt).toLocaleString()}
                   </p>
                 </div>
               </div>
@@ -652,10 +652,10 @@ export default function AdminUserDetail() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
             <h3 className="text-lg font-semibold mb-4">
-              {user.is_active ? 'Deactivate User' : 'Activate User'}
+              {user.isActive ? 'Deactivate User' : 'Activate User'}
             </h3>
             <p className="text-gray-600 mb-4">
-              {user.is_active
+              {user.isActive
                 ? 'Are you sure you want to deactivate this user? They will no longer be able to access the platform.'
                 : 'Are you sure you want to activate this user? They will be able to access the platform again.'}
             </p>
@@ -682,7 +682,7 @@ export default function AdminUserDetail() {
               <button
                 onClick={handleToggleStatus}
                 className={`flex-1 px-4 py-2 text-white rounded-md ${
-                  user.is_active
+                  user.isActive
                     ? 'bg-red-600 hover:bg-red-700'
                     : 'bg-green-600 hover:bg-green-700'
                 }`}
@@ -690,7 +690,7 @@ export default function AdminUserDetail() {
               >
                 {actionLoading
                   ? 'Processing...'
-                  : user.is_active
+                  : user.isActive
                   ? 'Deactivate'
                   : 'Activate'}
               </button>

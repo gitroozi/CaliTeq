@@ -146,6 +146,8 @@ export interface SubscriptionStatsResponse {
   total_subscriptions: number;
   active_subscriptions: number;
   cancelled_subscriptions: number;
+  cancelled_this_month?: number;
+  new_this_month?: number;
   tier_breakdown: {
     tier: string;
     displayName: string;
@@ -253,6 +255,10 @@ export interface AuditStatsResponse {
   adminCount: number;
   actionBreakdown: Record<string, number>;
   recentActions: AuditLog[];
+  total_logs?: number;
+  logs_today?: number;
+  logs_this_week?: number;
+  logs_this_month?: number;
 }
 
 // ============================================================================

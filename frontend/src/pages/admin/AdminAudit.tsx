@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { adminAuditApi, getErrorMessage } from '../../services/adminApi';
 import type { AuditLog, AuditStatsResponse } from '../../types/admin';
 
@@ -298,7 +298,7 @@ export default function AdminAudit() {
                     onClick={() => setSelectedLog(log)}
                   >
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {new Date(log.created_at).toLocaleString()}
+                      {new Date(log.createdAt).toLocaleString()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
@@ -310,26 +310,26 @@ export default function AdminAudit() {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {log.admin_email || 'System'}
+                      {log.admin?.email || 'System'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       <div>
-                        <span className="font-medium">{log.target_type}</span>
-                        {log.target_id && (
+                        <span className="font-medium">{log.targetType}</span>
+                        {log.targetId && (
                           <div className="text-xs text-gray-400 mt-1">
-                            {log.target_id.slice(0, 8)}...
+                            {log.targetId.slice(0, 8)}...
                           </div>
                         )}
                       </div>
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-500">
-                      {log.details && typeof log.details === 'object' ? (
+                      {log.changes && typeof log.changes === 'object' ? (
                         <div className="max-w-xs truncate">
-                          {Object.keys(log.details).length} changes
+                          {Object.keys(log.changes).length} changes
                         </div>
                       ) : (
                         <span className="max-w-xs truncate block">
-                          {log.details?.toString() || 'N/A'}
+                          {log.changes?.toString() || 'N/A'}
                         </span>
                       )}
                     </td>
@@ -456,7 +456,7 @@ export default function AdminAudit() {
                   Admin
                 </label>
                 <p className="mt-1 text-gray-900">
-                  {selectedLog.admin_email || 'System'}
+                  {selectedLog.admin?.email || 'System'}
                 </p>
               </div>
 
@@ -464,16 +464,16 @@ export default function AdminAudit() {
                 <label className="block text-sm font-medium text-gray-700">
                   Target Type
                 </label>
-                <p className="mt-1 text-gray-900">{selectedLog.target_type}</p>
+                <p className="mt-1 text-gray-900">{selectedLog.targetType}</p>
               </div>
 
-              {selectedLog.target_id && (
+              {selectedLog.targetId && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
                     Target ID
                   </label>
                   <p className="mt-1 text-gray-900 font-mono text-xs">
-                    {selectedLog.target_id}
+                    {selectedLog.targetId}
                   </p>
                 </div>
               )}
@@ -483,17 +483,17 @@ export default function AdminAudit() {
                   Timestamp
                 </label>
                 <p className="mt-1 text-gray-900">
-                  {new Date(selectedLog.created_at).toLocaleString()}
+                  {new Date(selectedLog.createdAt).toLocaleString()}
                 </p>
               </div>
 
-              {selectedLog.details && (
+              {selectedLog.changes && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Details
+                    Changes
                   </label>
                   <pre className="mt-1 bg-gray-50 p-4 rounded-md text-xs overflow-x-auto">
-                    {JSON.stringify(selectedLog.details, null, 2)}
+                    {JSON.stringify(selectedLog.changes, null, 2)}
                   </pre>
                 </div>
               )}
