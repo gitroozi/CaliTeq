@@ -14,6 +14,7 @@ import type {
   SubscriptionHistoryResponse,
   CreditTransactionsResponse,
 } from '../../types/admin';
+import AdminLayout from '../../components/admin/AdminLayout';
 
 export default function AdminUserDetail() {
   const { id } = useParams<{ id: string }>();
@@ -170,34 +171,39 @@ export default function AdminUserDetail() {
 
   if (loading) {
     return (
-      <div className="p-6">
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
-          <span className="ml-3 text-gray-600">Loading user details...</span>
+      <AdminLayout>
+        <div className="p-6">
+          <div className="flex items-center justify-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
+            <span className="ml-3 text-gray-600">Loading user details...</span>
+          </div>
         </div>
-      </div>
+      </AdminLayout>
     );
   }
 
   if (error || !user) {
     return (
-      <div className="p-6">
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-          {error || 'User not found'}
+      <AdminLayout>
+        <div className="p-6">
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+            {error || 'User not found'}
+          </div>
+          <button
+            onClick={() => navigate('/admin/users')}
+            className="mt-4 text-emerald-600 hover:text-emerald-900"
+          >
+            ← Back to Users
+          </button>
         </div>
-        <button
-          onClick={() => navigate('/admin/users')}
-          className="mt-4 text-emerald-600 hover:text-emerald-900"
-        >
-          ← Back to Users
-        </button>
-      </div>
+      </AdminLayout>
     );
   }
 
   return (
-    <div className="p-6">
-      {/* Header */}
+    <AdminLayout>
+      <div className="p-6">
+        {/* Header */}
       <div className="mb-6">
         <Link
           to="/admin/users"
@@ -698,6 +704,7 @@ export default function AdminUserDetail() {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </AdminLayout>
   );
 }

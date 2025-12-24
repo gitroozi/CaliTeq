@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { adminUsersApi, getErrorMessage } from '../../services/adminApi';
 import type { User, UsersListResponse, UserFilters } from '../../types/admin';
+import AdminLayout from '../../components/admin/AdminLayout';
 
 export default function AdminUsers() {
   const [users, setUsers] = useState<User[]>([]);
@@ -61,12 +62,13 @@ export default function AdminUsers() {
   const totalPages = Math.ceil(total / limit);
 
   return (
-    <div className="p-6">
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Users</h1>
-        <p className="text-gray-600 mt-1">Manage all registered users</p>
-      </div>
+    <AdminLayout>
+      <div className="p-6">
+        {/* Header */}
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-gray-900">Users</h1>
+          <p className="text-gray-600 mt-1">Manage all registered users</p>
+        </div>
 
       {/* Filters */}
       <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
@@ -349,6 +351,7 @@ export default function AdminUsers() {
           </div>
         )}
       </div>
-    </div>
+      </div>
+    </AdminLayout>
   );
 }

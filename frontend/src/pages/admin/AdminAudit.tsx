@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { adminAuditApi, getErrorMessage } from '../../services/adminApi';
 import type { AuditLog, AuditStatsResponse } from '../../types/admin';
+import AdminLayout from '../../components/admin/AdminLayout';
 
 export default function AdminAudit() {
   const [logs, setLogs] = useState<AuditLog[]>([]);
@@ -81,13 +82,14 @@ export default function AdminAudit() {
   };
 
   return (
-    <div className="p-6">
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Audit Logs</h1>
-        <p className="text-gray-600 mt-1">
-          Track all administrative actions and changes
-        </p>
+    <AdminLayout>
+      <div className="p-6">
+        {/* Header */}
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-gray-900">Audit Logs</h1>
+          <p className="text-gray-600 mt-1">
+            Track all administrative actions and changes
+          </p>
       </div>
 
       {/* Stats Overview */}
@@ -510,6 +512,7 @@ export default function AdminAudit() {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </AdminLayout>
   );
 }

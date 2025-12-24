@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { adminAuthApi, getErrorMessage } from '../../services/adminApi';
 import { useAdminAuthStore } from '../../store/adminAuthStore';
+import AdminLayout from '../../components/admin/AdminLayout';
 
 export default function AdminSettings() {
   const admin = useAdminAuthStore((state) => state.admin);
@@ -53,12 +54,13 @@ export default function AdminSettings() {
   };
 
   return (
-    <div className="p-6">
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-        <p className="text-gray-600 mt-1">Manage your admin account settings</p>
-      </div>
+    <AdminLayout>
+      <div className="p-6">
+        {/* Header */}
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
+          <p className="text-gray-600 mt-1">Manage your admin account settings</p>
+        </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Account Information */}
@@ -211,6 +213,7 @@ export default function AdminSettings() {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </AdminLayout>
   );
 }

@@ -10,6 +10,7 @@ import type {
   User,
   UsersListResponse,
 } from '../../types/admin';
+import AdminLayout from '../../components/admin/AdminLayout';
 
 export default function AdminSubscriptions() {
   const [stats, setStats] = useState<SubscriptionStatsResponse | null>(null);
@@ -69,12 +70,13 @@ export default function AdminSubscriptions() {
   const totalPages = Math.ceil(total / limit);
 
   return (
-    <div className="p-6">
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Subscriptions</h1>
-        <p className="text-gray-600 mt-1">Manage user subscriptions and tiers</p>
-      </div>
+    <AdminLayout>
+      <div className="p-6">
+        {/* Header */}
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-gray-900">Subscriptions</h1>
+          <p className="text-gray-600 mt-1">Manage user subscriptions and tiers</p>
+        </div>
 
       {/* Stats Overview */}
       {stats && (
@@ -394,6 +396,7 @@ export default function AdminSubscriptions() {
           </div>
         )}
       </div>
-    </div>
+      </div>
+    </AdminLayout>
   );
 }

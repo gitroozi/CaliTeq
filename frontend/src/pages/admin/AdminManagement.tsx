@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { adminAuthApi, getErrorMessage } from '../../services/adminApi';
 import type { Admin } from '../../types/admin';
 import { useIsSuperAdmin } from '../../store/adminAuthStore';
+import AdminLayout from '../../components/admin/AdminLayout';
 
 export default function AdminManagement() {
   const isSuperAdmin = useIsSuperAdmin();
@@ -95,17 +96,20 @@ export default function AdminManagement() {
 
   if (!isSuperAdmin) {
     return (
-      <div className="p-6">
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-          Access Denied: Super Admin privileges required
+      <AdminLayout>
+        <div className="p-6">
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+            Access Denied: Super Admin privileges required
+          </div>
         </div>
-      </div>
+      </AdminLayout>
     );
   }
 
   return (
-    <div className="p-6">
-      {/* Header */}
+    <AdminLayout>
+      <div className="p-6">
+        {/* Header */}
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Admin Management</h1>
@@ -448,6 +452,7 @@ export default function AdminManagement() {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </AdminLayout>
   );
 }
