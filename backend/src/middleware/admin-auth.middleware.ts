@@ -2,18 +2,7 @@ import { Request, Response, NextFunction } from 'express'
 import { verifyAdminToken, AdminTokenPayload } from '../utils/admin-jwt.js'
 import prisma from '../utils/db.js'
 
-// Extend Express Request type to include admin
-declare global {
-  namespace Express {
-    interface Request {
-      admin?: {
-        id: string
-        email: string
-        isSuperAdmin: boolean
-      }
-    }
-  }
-}
+// Admin properties are defined in types/express.ts as AdminRequest interface
 
 /**
  * Admin authentication middleware
@@ -64,11 +53,9 @@ export const authenticateAdmin = async (req: Request, res: Response, next: NextF
     }
 
     // Attach admin info to request
-    req.admin = {
-      id: admin.id,
-      email: admin.email,
-      isSuperAdmin: admin.is_super_admin,
-    }
+    ;(req as any).adminId = admin.id
+    ;(req as any).adminEmail = admin.email
+    ;(req as any).isSuperAdmin = admin.is_super_admin
 
     next()
   } catch (error) {
@@ -85,14 +72,14 @@ export const authenticateAdmin = async (req: Request, res: Response, next: NextF
  * Requires admin to be a super admin
  */
 export const requireSuperAdmin = (req: Request, res: Response, next: NextFunction) => {
-  if (!req.admin) {
+  if (!(req as any).adminId) {
     return res.status(401).json({
       success: false,
       error: 'Authentication required',
     })
   }
 
-  if (!req.admin.isSuperAdmin) {
+  if (!(req as any).isSuperAdmin) {
     return res.status(403).json({
       success: false,
       error: 'Super admin access required',
@@ -124,11 +111,9 @@ export const optionalAdminAuth = async (req: Request, res: Response, next: NextF
       })
 
       if (admin && admin.is_active) {
-        req.admin = {
-          id: admin.id,
-          email: admin.email,
-          isSuperAdmin: admin.is_super_admin,
-        }
+        ;(req as any).adminId = admin.id
+        ;(req as any).adminEmail = admin.email
+        ;(req as any).isSuperAdmin = admin.is_super_admin
       }
     } catch (error) {
       // Ignore token errors for optional auth

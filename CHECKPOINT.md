@@ -1,8 +1,8 @@
 # CaliFlow - Development Checkpoint
 
-**Date:** December 23, 2025
-**Project:** CaliFlow MVP - Phase 1
-**Status:** Phase 1A Complete ✅ | Phase 1B Complete ✅ | Phase 1C Complete ✅ | Phase 1D Complete ✅ | Phase 1E Complete ✅ | Phase 1F Complete ✅ | Phase 1G Complete ✅ | Production Deployment 🔄
+**Date:** December 24, 2025
+**Project:** CaliTeq MVP - Phase 1 + Admin Dashboard
+**Status:** Phase 1A Complete ✅ | Phase 1B Complete ✅ | Phase 1C Complete ✅ | Phase 1D Complete ✅ | Phase 1E Complete ✅ | Phase 1F Complete ✅ | Phase 1G Complete ✅ | Production Deployment ✅ | Admin Dashboard Backend 90% ✅
 
 ---
 
@@ -1620,3 +1620,433 @@ VITE_API_URL=https://api.caliteq.app/api
 5. Monitor for any deployment-specific issues
 
 ---
+
+### December 24, 2025 - Admin Dashboard Backend Implementation ✅
+
+**Status:** Phase 1 Complete ✅ | Phase 2 Complete ✅
+
+#### Overview
+Implemented backend infrastructure for admin dashboard based on previously approved architecture. Admin system enables user management, subscription management, credit management, and comprehensive audit logging.
+
+#### Phase 1: Database Foundation ✅
+
+**Database Migration:**
+- ✅ Created migration for 6 new admin system tables
+- ✅ Tables created: `admins`, `subscription_tiers`, `user_subscriptions`, `user_credits`, `credit_transactions`, `audit_logs`
+- ✅ All foreign keys and indexes properly configured
+- ✅ Migration verified and applied to production database
+
+**Seed Script (`backend/prisma/seed-admin.ts`):**
+- ✅ Created comprehensive seed script for admin system initialization
+- ✅ Seeded 3 subscription tiers:
+  - **Free**: $0/mo, 3 credits/month
+  - **Pro**: $9.99/mo, 20 credits/month
+  - **Premium**: $19.99/mo, 100 credits/month
+- ✅ Created initial super admin account:
+  - Email: `admin@caliteq.com`
+  - Password: `changeme123` (must be changed on first login)
+  - Role: Super Admin
+- ✅ Migrated 13 existing users to Free tier
+- ✅ Created credit accounts for all users with initial 3 credits
+
+**Database Status:**
+```
+Subscription Tiers: 3
+Admin Accounts: 2
+User Subscriptions: 13
+User Credit Accounts: 13
+```
+
+#### Phase 2: Backend API Controllers & Routes ✅
+
+**Controllers Created:**
+
+1. **Admin Auth Controller** (`backend/src/controllers/admin-auth.controller.ts`)
+   - ✅ POST `/api/admin/auth/login` - Admin login with audit logging
+   - ✅ POST `/api/admin/auth/refresh` - Refresh admin access token
+   - ✅ GET `/api/admin/auth/me` - Get current admin profile
+   - ✅ PUT `/api/admin/auth/password` - Change admin password
+   - ✅ POST `/api/admin/auth/create` - Create new admin (super admin only)
+   - ✅ PUT `/api/admin/auth/:id/deactivate` - Deactivate admin (super admin only)
+
+2. **Admin Users Controller** (`backend/src/controllers/admin-users.controller.ts`)
+   - ✅ GET `/api/admin/users` - Paginated user list with search/filter
+   - ✅ GET `/api/admin/users/:id` - Detailed user information
+   - ✅ PUT `/api/admin/users/:id/status` - Activate/deactivate user
+   - ✅ PUT `/api/admin/users/:id/email` - Update user email
+   - ✅ GET `/api/admin/users/stats` - User statistics dashboard
+   - ✅ GET `/api/admin/users/search` - Search users by email
+
+3. **Admin Subscriptions Controller** (`backend/src/controllers/admin-subscriptions.controller.ts`)
+   - ✅ GET `/api/admin/subscriptions/tiers` - List all subscription tiers
+   - ✅ PUT `/api/admin/users/:id/subscription` - Change user subscription tier
+   - ✅ POST `/api/admin/users/:id/subscription/cancel` - Cancel user subscription
+   - ✅ POST `/api/admin/users/:id/subscription/reactivate` - Reactivate subscription
+   - ✅ GET `/api/admin/subscriptions/stats` - Subscription statistics
+   - ✅ GET `/api/admin/users/:id/subscription/history` - User subscription history
+
+4. **Admin Credits Controller** (`backend/src/controllers/admin-credits.controller.ts`)
+   - ✅ POST `/api/admin/users/:id/credits/grant` - Grant credits to user
+   - ✅ POST `/api/admin/users/:id/credits/revoke` - Revoke credits from user
+   - ✅ GET `/api/admin/users/:id/credits` - Get user credit balance
+   - ✅ GET `/api/admin/users/:id/credits/transactions` - Credit transaction history
+   - ✅ GET `/api/admin/credits/stats` - Credit statistics
+
+5. **Admin Audit Controller** (`backend/src/controllers/admin-audit.controller.ts`)
+   - ✅ GET `/api/admin/audit/logs` - Get audit logs with filters
+   - ✅ GET `/api/admin/audit/logs/user/:userId` - User-specific audit logs
+   - ✅ GET `/api/admin/audit/logs/impersonation` - Impersonation logs
+   - ✅ GET `/api/admin/audit/stats` - Audit statistics
+
+**Route Files Created:**
+- ✅ `backend/src/routes/admin-auth.routes.ts`
+- ✅ `backend/src/routes/admin-users.routes.ts`
+- ✅ `backend/src/routes/admin-subscriptions.routes.ts`
+- ✅ `backend/src/routes/admin-credits.routes.ts`
+- ✅ `backend/src/routes/admin-audit.routes.ts`
+
+**Server Configuration:**
+- ✅ Admin routes mounted in `backend/src/server.ts`
+- ✅ All routes under `/api/admin/*` prefix
+- ✅ Authentication middleware applied to protected routes
+- ✅ Super admin authorization for sensitive operations
+
+**Type Definitions:**
+- ✅ Extended `AdminRequest` interface with `isSuperAdmin` property
+- ✅ Proper typing for all admin endpoints
+
+#### TypeScript Compilation Errors - FIXED ✅
+
+All TypeScript compilation errors have been resolved:
+- ✅ Fixed `AdminAuthService.login` - Updated to use object parameter
+- ✅ Fixed `AdminAuthService.createAdmin` - Corrected parameter order
+- ✅ Fixed `AdminAuthService.deactivateAdmin` - Corrected parameter order
+- ✅ Fixed `AuditService.getLogsByAdmin` - Renamed to `getAdminLogs`
+- ✅ Fixed `AuditService.getLogsByTarget` - Renamed to `getTargetLogs`
+- ✅ Fixed `AuditService.getAuditStats` - Renamed to `getStatistics`
+- ✅ Fixed `SubscriptionService.getAllTiers` - Renamed to `getTiers`
+- ✅ Fixed `SubscriptionService.changeUserSubscription` - Renamed to `changeUserTier` with correct parameters
+- ✅ Fixed `AdminUserService.searchUsers` - Renamed to `searchUsersByEmail`
+- ✅ Fixed all pagination parameter mismatches - Converted `page` to `offset` in all controllers
+- ✅ Fixed `CreditService.getUserTransactions` - Converted `page` to `offset`
+
+**Build Status:** ✅ Backend builds successfully with no TypeScript errors
+
+#### Architecture Implemented
+
+**Security:**
+- Separate JWT authentication for admins (5min access, 1day refresh vs 15min/7d for users)
+- All admin actions logged with IP address and user agent
+- Super admin authorization for sensitive operations
+- Password validation (minimum 8 characters)
+
+**Audit Logging:**
+- Every admin action automatically logged
+- Tracks before/after values for changes
+- Includes request context (IP, user agent)
+- Impersonation tracking (when implemented)
+
+**Subscription System:**
+- 3-tier model (Free, Pro, Premium)
+- Credit-based plan generation
+- Full subscription lifecycle management
+- Backward compatibility with legacy `subscription_tier` field
+
+**Credit System:**
+- Transaction-based accounting
+- Admin grant/revoke capabilities
+- Automatic monthly credit allocation
+- Full transaction history
+
+#### Files Created/Modified
+
+**New Files:**
+- `backend/prisma/migrations/20251224064331_add_admin_system/migration.sql`
+- `backend/prisma/seed-admin.ts`
+- `backend/src/controllers/admin-auth.controller.ts`
+- `backend/src/controllers/admin-users.controller.ts`
+- `backend/src/controllers/admin-subscriptions.controller.ts`
+- `backend/src/controllers/admin-credits.controller.ts`
+- `backend/src/controllers/admin-audit.controller.ts`
+- `backend/src/routes/admin-auth.routes.ts`
+- `backend/src/routes/admin-users.routes.ts`
+- `backend/src/routes/admin-subscriptions.routes.ts`
+- `backend/src/routes/admin-credits.routes.ts`
+- `backend/src/routes/admin-audit.routes.ts`
+- `backend/scripts/run-migration.ts` (utility)
+- `backend/scripts/check-tables.ts` (utility)
+
+**Modified Files:**
+- `backend/src/server.ts` - Added admin route imports and mounting
+- `backend/src/types/express.ts` - Added `isSuperAdmin` to `AdminRequest`
+
+#### Services Already Implemented ✅
+
+The following services were already implemented from previous work:
+- `backend/src/services/admin-auth.service.ts` - Admin authentication
+- `backend/src/services/admin-user.service.ts` - User management
+- `backend/src/services/subscription.service.ts` - Subscription management
+- `backend/src/services/credit.service.ts` - Credit management
+- `backend/src/services/audit.service.ts` - Audit logging
+- `backend/src/services/impersonation.service.ts` - User impersonation
+- `backend/src/middleware/admin-auth.middleware.ts` - Admin authentication
+- `backend/src/middleware/audit.middleware.ts` - Audit logging
+- `backend/src/utils/admin-jwt.ts` - Admin JWT utilities
+
+#### Next Steps
+
+**Immediate (Phase 2 Complete):**
+1. ✅ Fixed TypeScript compilation errors by aligning controller calls with service signatures
+2. ⏭️ Test all admin endpoints locally
+3. ✅ Backend build verified - no errors
+
+**Phase 3: Frontend Admin Infrastructure (Pending)**
+1. Create admin types (`frontend/src/types/admin.ts`)
+2. Create admin API service (`frontend/src/services/adminApi.ts`)
+3. Create admin auth store (`frontend/src/store/adminAuthStore.ts`)
+4. Create admin protected route component
+5. Create admin layout component
+
+**Phase 4: Frontend Admin Pages (Pending)**
+1. Admin login page (`/admin/login`)
+2. Admin dashboard page (`/admin/dashboard`)
+3. Users list page (`/admin/users`)
+4. User detail page (`/admin/users/:id`)
+5. Audit logs page (`/admin/audit`)
+
+**Phase 5: Testing & Deployment (Pending)**
+1. Local testing of all admin features
+2. Deploy to production
+3. Test admin portal in production
+4. Change default admin password
+
+#### Admin Credentials
+
+**Super Admin Account:**
+- Email: `admin@caliteq.com`
+- Password: `changeme123`
+- **⚠️ CRITICAL: Change password immediately on first login!**
+
+---
+
+### December 24, 2025 - Frontend Admin Infrastructure Complete ✅
+
+**Status:** Admin backend infrastructure complete | Admin frontend infrastructure complete ✅
+
+#### Overview
+Built complete frontend admin infrastructure including types, API services, state management, routing, and UI components.
+
+#### Frontend Admin Infrastructure Created
+
+**1. Admin Types** (`frontend/src/types/admin.ts`)
+- ✅ Comprehensive TypeScript interfaces for all admin features
+- ✅ Admin authentication types (Admin, AdminLoginRequest, AdminLoginResponse)
+- ✅ User management types (User, UserDetails, UsersListResponse, UserStatsResponse)
+- ✅ Subscription management types (SubscriptionTier, UserSubscription, SubscriptionStatsResponse)
+- ✅ Credit management types (UserCredits, CreditTransaction, CreditStatsResponse)
+- ✅ Audit logging types (AuditLog, AuditLogsResponse, AuditStatsResponse)
+- ✅ API response types (ApiResponse, ApiError, ApiResult)
+- ✅ Filter and pagination types
+
+**2. Admin API Service** (`frontend/src/services/adminApi.ts`)
+- ✅ Axios-based API client with automatic token management
+- ✅ Request interceptor for automatic token attachment
+- ✅ Response interceptor for automatic token refresh on 401
+- ✅ Complete API coverage:
+  - Admin authentication API (login, refresh, getMe, changePassword, createAdmin)
+  - User management API (getStats, getUsers, getUserDetails, searchUsers, updateUserStatus)
+  - Subscription management API (getTiers, getStats, changeUserSubscription, getUserSubscriptionHistory)
+  - Credit management API (getUserCredits, grantCredits, revokeCredits, getTransactions)
+  - Audit logging API (getLogs, getUserLogs, getImpersonationLogs, getStats)
+- ✅ Error handling utilities (getErrorMessage)
+
+**3. Admin Auth Store** (`frontend/src/store/adminAuthStore.ts`)
+- ✅ Zustand state management with localStorage persistence
+- ✅ Admin authentication state (admin, accessToken, refreshToken, isAuthenticated)
+- ✅ Actions: login, logout, refreshAuth, clearError, checkAuth
+- ✅ Helper hooks:
+  - `useAdmin()` - Get current admin object
+  - `useIsAdminAuthenticated()` - Check authentication status
+  - `useIsSuperAdmin()` - Check super admin privilege
+- ✅ Automatic state persistence across page reloads
+
+**4. Admin Protected Route** (`frontend/src/components/admin/AdminProtectedRoute.tsx`)
+- ✅ Route guard component for admin pages
+- ✅ Authentication verification on mount
+- ✅ Super admin requirement support (requireSuperAdmin prop)
+- ✅ Loading state while verifying authentication
+- ✅ Automatic redirect to /admin/login for unauthenticated access
+- ✅ Permission denied UI for non-super-admin accessing super-admin routes
+
+**5. Admin Layout** (`frontend/src/components/admin/AdminLayout.tsx`)
+- ✅ Responsive sidebar navigation with mobile support
+- ✅ Navigation items:
+  - Dashboard
+  - Users
+  - Subscriptions
+  - Audit Logs
+  - Admins (super admin only)
+- ✅ Mobile hamburger menu with backdrop
+- ✅ Admin profile display in sidebar
+- ✅ Logout button in header
+- ✅ Active route highlighting
+- ✅ Professional UI with Tailwind CSS
+
+**6. Admin Login Page** (`frontend/src/pages/admin/AdminLogin.tsx`)
+- ✅ Email/password login form
+- ✅ Error display with visual feedback
+- ✅ Loading state during authentication
+- ✅ Redirect to intended page after login
+- ✅ Form validation
+- ✅ Security notice for admin access
+
+**7. Admin Dashboard Page** (`frontend/src/pages/admin/AdminDashboard.tsx`)
+- ✅ Stats overview cards:
+  - Total Users
+  - Active Users
+  - New Users This Week
+  - Active Subscriptions
+- ✅ Quick action cards for navigation
+- ✅ Welcome message with admin name
+- ✅ Loading states
+- ✅ API integration for real-time stats
+- ✅ Super admin conditional rendering
+
+**8. App.tsx Integration**
+- ✅ Admin routes added to main router:
+  - `/admin/login` - Public admin login page
+  - `/admin/dashboard` - Protected admin dashboard
+  - `/admin/users` - Protected users list (placeholder)
+  - `/admin/users/:id` - Protected user details (placeholder)
+  - `/admin/subscriptions` - Protected subscriptions (placeholder)
+  - `/admin/audit` - Protected audit logs (placeholder)
+  - `/admin/admins` - Protected admin management (super admin only, placeholder)
+- ✅ Proper route protection with AdminProtectedRoute
+- ✅ Super admin route protection for /admin/admins
+
+#### Features Implemented
+
+**Authentication & Authorization:**
+- ✅ Separate admin authentication system from user auth
+- ✅ JWT token management with automatic refresh
+- ✅ Persistent sessions using localStorage
+- ✅ Role-based access control (admin vs super admin)
+- ✅ Protected routes with auth verification
+- ✅ Automatic logout and redirect on token expiration
+
+**State Management:**
+- ✅ Zustand store with persistence middleware
+- ✅ Type-safe state updates
+- ✅ React hooks for easy component integration
+- ✅ Automatic token synchronization with localStorage
+
+**API Integration:**
+- ✅ Complete admin API client
+- ✅ Request/response interceptors
+- ✅ Automatic token refresh
+- ✅ Type-safe API calls
+- ✅ Error handling utilities
+
+**UI Components:**
+- ✅ Responsive admin layout with sidebar
+- ✅ Mobile-friendly navigation
+- ✅ Professional styling with Tailwind CSS
+- ✅ Loading and error states
+- ✅ Permission-based UI elements
+
+#### Build Status
+- ✅ Frontend builds successfully with no TypeScript errors
+- ✅ All admin components properly typed
+- ✅ Routes integrated into App.tsx
+- ✅ Ready for development and testing
+
+#### Admin Credentials (Development)
+- **Email:** admin@caliteq.com
+- **Password:** changeme123
+- **⚠️ IMPORTANT:** Change password immediately in production
+
+#### Next Steps
+
+**Phase 4: Admin Pages Implementation (Pending)**
+Build the actual admin pages to replace placeholders:
+1. Users List Page (`/admin/users`)
+   - User table with search/filter
+   - Pagination
+   - User status indicators
+   - Quick actions (view, edit, activate/deactivate)
+
+2. User Detail Page (`/admin/users/:id`)
+   - User profile information
+   - Subscription details
+   - Credit balance and transactions
+   - Workout plans and logs
+   - Action buttons (change subscription, grant/revoke credits)
+   - Audit log for user
+
+3. Subscriptions Page (`/admin/subscriptions`)
+   - Subscription tiers overview
+   - Statistics by tier
+   - Subscription management tools
+
+4. Audit Logs Page (`/admin/audit`)
+   - Filterable audit log table
+   - Search by admin, action, target
+   - Date range filtering
+   - Pagination
+
+5. Admin Management Page (`/admin/admins`) - Super Admin Only
+   - List of all admins
+   - Create new admin
+   - Deactivate admin accounts
+   - Role management
+
+**Phase 5: Testing & Polish (Pending)**
+1. Test admin login flow
+2. Test all admin API endpoints from UI
+3. Add loading skeletons
+4. Add toast notifications
+5. Add confirmation dialogs for destructive actions
+6. Add data export features
+
+#### Files Created/Modified
+
+**New Files (7):**
+1. `frontend/src/types/admin.ts` - Admin TypeScript types
+2. `frontend/src/services/adminApi.ts` - Admin API service
+3. `frontend/src/store/adminAuthStore.ts` - Admin auth store
+4. `frontend/src/components/admin/AdminProtectedRoute.tsx` - Protected route component
+5. `frontend/src/components/admin/AdminLayout.tsx` - Admin layout component
+6. `frontend/src/pages/admin/AdminLogin.tsx` - Admin login page
+7. `frontend/src/pages/admin/AdminDashboard.tsx` - Admin dashboard page
+
+**Modified Files (1):**
+1. `frontend/src/App.tsx` - Added admin routes
+
+#### Technical Notes
+
+**Separation of Concerns:**
+- Admin auth is completely separate from user auth
+- Different token storage keys (adminAccessToken vs accessToken)
+- Separate Zustand stores
+- Different API base paths (/admin/* vs /api/*)
+
+**Security:**
+- Admin tokens stored in localStorage (separate from user tokens)
+- Automatic token refresh on expiration
+- Protected routes verify authentication on mount
+- Super admin routes have additional permission checks
+- All API calls include bearer token automatically
+
+**Type Safety:**
+- Full TypeScript coverage for admin features
+- Type-safe API calls
+- Typed Zustand store
+- Proper interface definitions for all data structures
+
+---
+
+**Last Updated:** December 24, 2025
+**Current Focus:** Frontend Admin Infrastructure - Complete ✅
+**Next:** Admin Pages Implementation (Users, Subscriptions, Audit Logs)
+**Generated with:** Claude Sonnet 4.5
+

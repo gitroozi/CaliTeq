@@ -31,7 +31,8 @@ export const auditLog = (action: string, targetType: string) => {
     // Override json method to capture response
     res.json = function (data: any) {
       // Only log if admin is authenticated and request was successful
-      if (req.admin && res.statusCode >= 200 && res.statusCode < 300) {
+      const adminId = (req as any).adminId
+      if (adminId && res.statusCode >= 200 && res.statusCode < 300) {
         // Extract target ID from request
         let targetId = req.params.id || req.params.userId || req.body.userId || 'unknown'
 
@@ -48,7 +49,7 @@ export const auditLog = (action: string, targetType: string) => {
 
         // Log the action (fire and forget - don't block response)
         AuditService.logAction({
-          adminId: req.admin.id,
+          adminId,
           action,
           targetType,
           targetId,
@@ -128,14 +129,15 @@ export const logAdminAction = async (
   targetId: string,
   changes?: Record<string, any>
 ) => {
-  if (!req.admin) {
+  const adminId = (req as any).adminId
+  if (!adminId) {
     console.warn('Attempted to log admin action without admin authentication')
     return
   }
 
   try {
     await AuditService.logAction({
-      adminId: req.admin.id,
+      adminId,
       action,
       targetType,
       targetId,

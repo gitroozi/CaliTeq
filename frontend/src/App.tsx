@@ -16,6 +16,16 @@ import OnboardingStep4 from './pages/OnboardingStep4'
 import OnboardingStep5 from './pages/OnboardingStep5'
 import NotFound from './pages/NotFound'
 
+// Admin components
+import AdminProtectedRoute from './components/admin/AdminProtectedRoute'
+import AdminLogin from './pages/admin/AdminLogin'
+import AdminDashboard from './pages/admin/AdminDashboard'
+import AdminUsers from './pages/admin/AdminUsers'
+import AdminUserDetail from './pages/admin/AdminUserDetail'
+import AdminSubscriptions from './pages/admin/AdminSubscriptions'
+import AdminAudit from './pages/admin/AdminAudit'
+import AdminManagement from './pages/admin/AdminManagement'
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -123,6 +133,57 @@ function App() {
               <ProtectedRoute>
                 <OnboardingStep5 />
               </ProtectedRoute>
+            }
+          />
+
+          {/* Admin Routes */}
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route
+            path="/admin/dashboard"
+            element={
+              <AdminProtectedRoute>
+                <AdminDashboard />
+              </AdminProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/users"
+            element={
+              <AdminProtectedRoute>
+                <AdminUsers />
+              </AdminProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/users/:id"
+            element={
+              <AdminProtectedRoute>
+                <AdminUserDetail />
+              </AdminProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/subscriptions"
+            element={
+              <AdminProtectedRoute>
+                <AdminSubscriptions />
+              </AdminProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/audit"
+            element={
+              <AdminProtectedRoute>
+                <AdminAudit />
+              </AdminProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/admins"
+            element={
+              <AdminProtectedRoute requireSuperAdmin={true}>
+                <AdminManagement />
+              </AdminProtectedRoute>
             }
           />
 

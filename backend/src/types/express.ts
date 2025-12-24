@@ -19,6 +19,7 @@ export interface AuthRequest extends Request {
 export interface AdminRequest extends Request {
   adminId?: string;
   adminEmail?: string;
+  isSuperAdmin?: boolean;
   isImpersonating?: boolean;
   originalAdminId?: string;
   body: any;

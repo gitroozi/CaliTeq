@@ -11,6 +11,13 @@ import workoutRoutes from './routes/workout.routes.js'
 import workoutLogRoutes from './routes/workout-log.routes.js'
 import progressRoutes from './routes/progress.routes.js'
 
+// Admin Routes
+import adminAuthRoutes from './routes/admin-auth.routes.js'
+import adminUsersRoutes from './routes/admin-users.routes.js'
+import adminSubscriptionsRoutes from './routes/admin-subscriptions.routes.js'
+import adminCreditsRoutes from './routes/admin-credits.routes.js'
+import adminAuditRoutes from './routes/admin-audit.routes.js'
+
 // Middleware
 import { errorHandler, notFoundHandler } from './middleware/error.middleware.js'
 
@@ -115,6 +122,13 @@ app.use('/api/workout-logs', workoutLogRoutes)
 
 // Progress tracking routes
 app.use('/api/progress', progressRoutes)
+
+// Admin routes
+app.use('/api/admin/auth', adminAuthRoutes)
+app.use('/api/admin/users', adminUsersRoutes)
+app.use('/api/admin/subscriptions', adminSubscriptionsRoutes)
+app.use('/api/admin/credits', adminCreditsRoutes)
+app.use('/api/admin/audit', adminAuditRoutes)
 
 // Error handling middleware (must be last)
 app.use(notFoundHandler)
