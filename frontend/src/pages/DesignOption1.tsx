@@ -1,4 +1,3 @@
-import { NavLink } from 'react-router-dom';
 import AppShell from '../components/AppShell';
 
 // Design Option 1: Energetic Fitness (Orange & Teal)
