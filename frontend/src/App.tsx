@@ -17,6 +17,12 @@ import OnboardingStep4 from './pages/OnboardingStep4'
 import OnboardingStep5 from './pages/OnboardingStep5'
 import NotFound from './pages/NotFound'
 
+// Design Option Pages
+import DesignOption1 from './pages/DesignOption1'
+import DesignOption2 from './pages/DesignOption2'
+import DesignOption3 from './pages/DesignOption3'
+import DesignOption4 from './pages/DesignOption4'
+
 // Admin components
 import AdminProtectedRoute from './components/admin/AdminProtectedRoute'
 import AdminLogin from './pages/admin/AdminLogin'
@@ -138,6 +144,12 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          {/* Design Option Routes */}
+          <Route path="/design_1" element={<DesignOption1 />} />
+          <Route path="/design_2" element={<DesignOption2 />} />
+          <Route path="/design_3" element={<DesignOption3 />} />
+          <Route path="/design_4" element={<DesignOption4 />} />
 
           {/* Admin Routes */}
           <Route path="/admin/login" element={<AdminLogin />} />
